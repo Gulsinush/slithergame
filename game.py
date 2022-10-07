@@ -7,6 +7,7 @@ This is a temporary script file.
 import tkinter as tk
 import threading as tm
 import time
+import tkinter.messagebox as mb
 
 basic_coord = ([300,300,320,320],
                [320,300,340,320],
@@ -17,6 +18,9 @@ basic_coord = ([300,300,320,320],
 class Snake:
     
     coord_list = []
+    
+    step_x =0
+    step_y =0
     
     def __init__(self):
         self.coord_list=list(basic_coord)
@@ -31,14 +35,20 @@ class Snake:
                                     self.coord_list[i][2], self.coord_list[i][3], 
                                     outline=color, fill="green")
                 
-    def change_coord(self,step_x,step_y):
-        for i in range(len(self.coord_list)-1,0,-1):
-            for j in range(4):
-                self.coord_list[i][j] = self.coord_list[i-1][j]  
-        self.coord_list[0][0] += step_x
-        self.coord_list[0][2] += step_x
-        self.coord_list[0][1] += step_y
-        self.coord_list[0][3] += step_y
+    def change_coord(self):
+        
+        if self.step_x+self.step_y != 0:
+            for i in range(len(self.coord_list)-1,0,-1):
+                for j in range(4):
+                    self.coord_list[i][j] = self.coord_list[i-1][j]  
+            self.coord_list[0][0] += self.step_x
+            self.coord_list[0][2] += self.step_x
+            self.coord_list[0][1] += self.step_y
+            self.coord_list[0][3] += self.step_y
+        
+    def change_step(self, event, step_x, step_y):
+        self.step_x = step_x
+        self.step_y = step_y
             
 window = tk.Tk()
 window.geometry('600x600')
@@ -50,26 +60,22 @@ canvas.pack()
 
 
 snake1 = Snake()
-x = -20
-y = 0 
-x_list = [-20,0,20,0]
-y_list = [0,20,0,-20]
-count = 0
+
 while True:
     snake1.draw()
-    snake1.change_coord(x,y)
+    window.bind('<KeyRelease-Left>',lambda e, step_x=-20, step_y=0: 
+            snake1.change_step(e,step_x, step_y))
+    snake1.change_coord()
+#window.bind("KeyRelease_Right",snake1.change_coord(1,0))
+    #window.bind("KeyRelease_Up",snake1.change_coord(0,-1))
+    #window.bind("KeyRelease_Down",snake1.change_coord(0,1))
     window.update_idletasks()
     window.update()
-    time.sleep(0.3)
-    count += 1
-    y=y_list[count//6]
-    x=x_list[count//6]
-    if count>22:
-        count=0
-        
+    time.sleep(0.3)  
     canvas.delete("all")
-
-
+    
+#window.mainloop()
+#mb.showwarning("Предупреждение", step_x)
 
   
     
