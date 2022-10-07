@@ -12,17 +12,24 @@ import random as rd
 
 
 basic_coord = ([300,300,320,320],
-               [320,300,340,320],
-               [340,300,360,320],
-               [360,300,380,320]
+               [306,300,326,320],
+               [312,300,332,320],
+               [318,300,338,320]
                )
+
 
 class Snake:
     
     coord_list = []
     
+    head = []
+    
     step_x =0
     step_y =0
+    
+    step = {'x': [0, 0, 0, 0],
+            'y': [0, 0, 0, 0], 
+            }
     
     def __init__(self):
         self.coord_list=list(basic_coord)
@@ -32,28 +39,40 @@ class Snake:
         color = "red"
         for i in range(len(self.coord_list)):
             if i>0:
-                color = "orange"
+                color = "green"
             canvas.create_rectangle(self.coord_list[i][0], self.coord_list[i][1], 
                                     self.coord_list[i][2], self.coord_list[i][3], 
                                     outline=color, fill="green")
                 
     def change_coord(self, food):
         
-        if self.step_x+self.step_y != 0:
-            for i in range(len(self.coord_list)-1,0,-1):
-                for j in range(4):
-                    self.coord_list[i][j] = self.coord_list[i-1][j]  
-            self.coord_list[0][0] += self.step_x
-            self.coord_list[0][2] += self.step_x
-            self.coord_list[0][1] += self.step_y
-            self.coord_list[0][3] += self.step_y
-            self.eating(food)
-            self.game_over()
+        if (self.step['x'][1]+self.step['y'][1])==0:
+            for i in range(1, len(self.step['x']), 1):
+                self.step['x'][i] = self.step['x'][i-1]
+                self.step['y'][i] = self.step['y'][i-1]
+        
+        for i in range(len(self.coord_list)):
+            for j in range(len(self.coord_list[0])):
+                if j % 2 == 0:
+                    self.coord_list[i][j] += self.step['x'][i]
+                else:
+                    self.coord_list[i][j] += self.step['y'][i] 
+     
+        for i in range(1, len(self.coord_list), 1):
+            #f len(self.head) >0 and self.step['x'][0]==0:
+             #   mb.showwarning(self.coord_list[i], self.head)
+            if self.coord_list[i] == self.head:
+                self.step['x'][i] = self.step['x'][0]
+                self.step['y'][i] = self.step['y'][0]
+     
+        self.eating(food)
+        self.game_over()
         
     def change_step(self, event, step_x, step_y):
-        if abs(step_x-self.step_x)!=40 and abs(step_y-self.step_y)!=40:
-            self.step_x = step_x
-            self.step_y = step_y
+        #if abs(step_x-self.step_x)!=40 and abs(step_y-self.step_y)!=40:
+        self.head = self.coord_list[0][:]
+        self.step['x'][0] = step_x
+        self.step['y'][0] = step_y
             
     def eating(self, food):
         if self.coord_list[0]==food.food_coord:
@@ -100,18 +119,18 @@ food = Food()
 while True:
     snake1.draw()
     food.draw()
-    window.bind('<KeyRelease-Left>',lambda e, step_x=-20, step_y=0: 
+    window.bind('<KeyRelease-Left>',lambda e, step_x=-2, step_y=0: 
             snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Right>',lambda e, step_x=20, step_y=0: 
+    window.bind('<KeyRelease-Right>',lambda e, step_x=2, step_y=0: 
             snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Up>',lambda e, step_x=0, step_y=-20: 
+    window.bind('<KeyRelease-Up>',lambda e, step_x=0, step_y=-2: 
             snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Down>',lambda e, step_x=0, step_y=20: 
+    window.bind('<KeyRelease-Down>',lambda e, step_x=0, step_y=2: 
             snake1.change_step(e,step_x, step_y))
     snake1.change_coord(food)
     window.update_idletasks()
     window.update()
-    time.sleep(0.3)  
+    time.sleep(0.1)  
     canvas.delete("all")
     
 #window.mainloop()
