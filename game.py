@@ -20,6 +20,8 @@ basic_coord = ([300,300,320,320],
 
 class Snake:
     
+    start = 0
+    
     coord_list = []
     
     head = []
@@ -27,7 +29,7 @@ class Snake:
     step_x =0
     step_y =0
     
-    step = {'x': [0, 0, 0, 0],
+    step = {'x': [0, -1, -1, -1],
             'y': [0, 0, 0, 0], 
             }
     
@@ -46,33 +48,36 @@ class Snake:
                 
     def change_coord(self, food):
         
-        if (self.step['x'][1]+self.step['y'][1])==0:
-            for i in range(1, len(self.step['x']), 1):
-                self.step['x'][i] = self.step['x'][i-1]
-                self.step['y'][i] = self.step['y'][i-1]
-        
-        for i in range(len(self.coord_list)):
-            for j in range(len(self.coord_list[0])):
-                if j % 2 == 0:
-                    self.coord_list[i][j] += self.step['x'][i]
-                else:
-                    self.coord_list[i][j] += self.step['y'][i] 
-     
-        for i in range(1, len(self.coord_list), 1):
-            #f len(self.head) >0 and self.step['x'][0]==0:
-             #   mb.showwarning(self.coord_list[i], self.head)
-            if self.coord_list[i] == self.head:
-                self.step['x'][i] = self.step['x'][0]
-                self.step['y'][i] = self.step['y'][0]
+        if self.start == 1:
+            for i in range(len(self.coord_list)):
+                for j in range(len(self.coord_list[0])):
+                    if j % 2 == 0:
+                        self.coord_list[i][j] += self.step['x'][i]
+                    else:
+                        self.coord_list[i][j] += self.step['y'][i] 
+         
+            for i in range(1, len(self.coord_list), 1):
+                #f len(self.head) >0 and self.step['x'][0]==0:
+                 #   mb.showwarning(self.coord_list[i], self.head)
+                if self.coord_list[i] == self.head:
+                    self.step['x'][i] = self.step['x'][0]
+                    self.step['y'][i] = self.step['y'][0]
      
         self.eating(food)
         self.game_over()
         
     def change_step(self, event, step_x, step_y):
-        #if abs(step_x-self.step_x)!=40 and abs(step_y-self.step_y)!=40:
+        self.start = 1
         self.head = self.coord_list[0][:]
-        self.step['x'][0] = step_x
-        self.step['y'][0] = step_y
+        
+        if self.step['y'][0]==0 and step_x == 0:
+           self.step['y'][0] = step_y
+           self.step['x'][0] = step_x
+           
+        if self.step['x'][0]==0 and step_y == 0 :
+            self.step['x'][0] = step_x
+            self.step['y'][0] = step_y
+        
             
     def eating(self, food):
         if self.coord_list[0]==food.food_coord:
@@ -119,18 +124,18 @@ food = Food()
 while True:
     snake1.draw()
     food.draw()
-    window.bind('<KeyRelease-Left>',lambda e, step_x=-2, step_y=0: 
-            snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Right>',lambda e, step_x=2, step_y=0: 
-            snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Up>',lambda e, step_x=0, step_y=-2: 
-            snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Down>',lambda e, step_x=0, step_y=2: 
-            snake1.change_step(e,step_x, step_y))
-    snake1.change_coord(food)
     window.update_idletasks()
     window.update()
-    time.sleep(0.1)  
+    window.bind('<KeyRelease-Left>',lambda e, step_x=-1, step_y=0: 
+            snake1.change_step(e,step_x, step_y))
+    window.bind('<KeyRelease-Right>',lambda e, step_x=1, step_y=0: 
+            snake1.change_step(e,step_x, step_y))
+    window.bind('<KeyRelease-Up>',lambda e, step_x=0, step_y=-1: 
+            snake1.change_step(e,step_x, step_y))
+    window.bind('<KeyRelease-Down>',lambda e, step_x=0, step_y=1: 
+            snake1.change_step(e,step_x, step_y))
+    snake1.change_coord(food)
+    time.sleep(0.01)  
     canvas.delete("all")
     
 #window.mainloop()
