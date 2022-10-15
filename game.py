@@ -5,90 +5,92 @@ Spyder Editor
 This is a temporary script file.
 """
 import tkinter as tk
-import threading as tm
 import time
 import tkinter.messagebox as mb
 import random as rd
 
 
-basic_coord = ([300,300,320,320],
-               [306,300,326,320],
-               [312,300,332,320],
-               [318,300,338,320]
-               )
-
 
 class Snake:
     
-    start = 0
-    
-    coord_list = []
-    
-    head = []
-    
-    step_x =0
-    step_y =0
-    
-    step = {'x': [0, -1, -1, -1],
-            'y': [0, 0, 0, 0], 
-            }
-    
-    def __init__(self):
-        self.coord_list=list(basic_coord)
+    def __init__(self, start_coord, length, width):
+        self.coord_list = [] 
+        self.step_x = 0
+        self.step_y = 0
+        self.flag_change=False
+        for i in range(length):
+            snake_section = [start_coord + i, start_coord, start_coord + width + i, start_coord + width]
+            self.coord_list.append(snake_section)
         
 
     def draw(self):
-        color = "red"
-        for i in range(len(self.coord_list)):
-            if i>0:
-                color = "green"
+        color = "green"
+        for i in range(len(self.coord_list)-1,-1,-1):
+            if i==0:
+                color = "black"
             canvas.create_rectangle(self.coord_list[i][0], self.coord_list[i][1], 
                                     self.coord_list[i][2], self.coord_list[i][3], 
                                     outline=color, fill="green")
                 
     def change_coord(self, food):
         
-        if self.start == 1:
-            for i in range(len(self.coord_list)):
-                for j in range(len(self.coord_list[0])):
-                    if j % 2 == 0:
-                        self.coord_list[i][j] += self.step['x'][i]
-                    else:
-                        self.coord_list[i][j] += self.step['y'][i] 
-         
-            for i in range(1, len(self.coord_list), 1):
-                #f len(self.head) >0 and self.step['x'][0]==0:
-                 #   mb.showwarning(self.coord_list[i], self.head)
-                if self.coord_list[i] == self.head:
-                    self.step['x'][i] = self.step['x'][0]
-                    self.step['y'][i] = self.step['y'][0]
+        if self.step_x+self.step_y != 0:
+            for i in range(len(self.coord_list)-1,0,-1):
+                for j in range(4):
+                    self.coord_list[i][j] = self.coord_list[i-1][j]  
+            self.coord_list[0][0] += self.step_x
+            self.coord_list[0][2] += self.step_x
+            self.coord_list[0][1] += self.step_y
+            self.coord_list[0][3] += self.step_y
+        
      
         self.eating(food)
-        self.game_over()
+
         
     def change_step(self, event, step_x, step_y):
-        self.start = 1
-        self.head = self.coord_list[0][:]
-        
-        if self.step['y'][0]==0 and step_x == 0:
-           self.step['y'][0] = step_y
-           self.step['x'][0] = step_x
-           
-        if self.step['x'][0]==0 and step_y == 0 :
-            self.step['x'][0] = step_x
-            self.step['y'][0] = step_y
+        if self.flag_change==False:
+            
+            if self.step_y==0 and step_x == 0:
+               self.step_y = step_y
+               self.step_x = step_x
+    
+            if self.step_x==0 and step_y == 0 :
+                self.step_x = step_x
+                self.step_y = step_y
+            self.flag_change=True
         
             
     def eating(self, food):
-        if self.coord_list[0]==food.food_coord:
-            mb.showwarning("Attention","Вкусно")
-            window.destroy()
-            
-    def game_over(self):
+        if intersection(self.coord_list[0], food.food_coord):
+            food.change_food()
+            food.draw()
+            step_x = self.coord_list[-1][0]-self.coord_list[-2][0]
+            step_y = self.coord_list[-1][1]-self.coord_list[-2][1]
+            for j in range(10):
+                self.coord_list.append([self.coord_list[-1][i] + step_x if i % 2 == 0 else self.coord_list[-1][i] + step_y for i in range(len(self.coord_list[-1]))])
+            #global timesleep
+            #timesleep*=0.8
+    
+    def not_game_over(self):
         for i in self.coord_list[0]:
             if i<0 or i>size:
-                mb.showwarning("Attention","Game over")
-                window.destroy()
+                return False
+        return True
+
+                
+
+                
+def intersection(list1, list2):
+    flag_x =False
+    flag_y = False
+    if list2[0] <= list1[0] <= list2[2] or list2[0] <= list1[2] <= list2[2]:
+        flag_x = True
+    if list2[1] <= list1[1] <= list2[3] or list2[1] <= list1[3] <= list2[3]:
+        flag_y = True   
+    if flag_x and flag_y:
+        return True
+    else:
+        return False
                 
 class Food:
     
@@ -114,16 +116,20 @@ window.geometry('600x600')
 window.title("Snake")
 window.iconbitmap('logo.ico')
 size = 600
+#timesleep=0.0001
 canvas = tk.Canvas(window, width=size, height=size)
 canvas.pack()
 
 
-snake1 = Snake()
+snake1 = Snake(300,40,20)
 food = Food()
 
-while True:
+
+while snake1.not_game_over():
+    canvas.delete("all")
+    snake1.flag_change=False
     snake1.draw()
-    food.draw()
+    #food.draw()
     window.update_idletasks()
     window.update()
     window.bind('<KeyRelease-Left>',lambda e, step_x=-1, step_y=0: 
@@ -135,9 +141,13 @@ while True:
     window.bind('<KeyRelease-Down>',lambda e, step_x=0, step_y=1: 
             snake1.change_step(e,step_x, step_y))
     snake1.change_coord(food)
-    time.sleep(0.01)  
-    canvas.delete("all")
-    
+    time.sleep(0.0001)  
+
+
+message = "Ваш результат " + str(len(snake1.coord_list))
+mb.showwarning("Game over", message)
+window.destroy()
+
 #window.mainloop()
 #mb.showwarning("Предупреждение", step_x)
 
