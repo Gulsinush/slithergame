@@ -75,10 +75,10 @@ class Snake:
         for i in self.coord_list[0]:
             if i<0 or i>size:
                 return False
+        for part1 in self.coord_list[50:]:
+            if intersection(self.coord_list[0], part1):
+                return False
         return True
-
-                
-
                 
 def intersection(list1, list2):
     flag_x =False
@@ -116,7 +116,7 @@ window.geometry('600x600')
 window.title("Snake")
 window.iconbitmap('logo.ico')
 size = 600
-#timesleep=0.0001
+timesleep=0.003
 canvas = tk.Canvas(window, width=size, height=size)
 canvas.pack()
 
@@ -129,7 +129,7 @@ while snake1.not_game_over():
     canvas.delete("all")
     snake1.flag_change=False
     snake1.draw()
-    #food.draw()
+    food.draw()
     window.update_idletasks()
     window.update()
     window.bind('<KeyRelease-Left>',lambda e, step_x=-1, step_y=0: 
@@ -141,7 +141,7 @@ while snake1.not_game_over():
     window.bind('<KeyRelease-Down>',lambda e, step_x=0, step_y=1: 
             snake1.change_step(e,step_x, step_y))
     snake1.change_coord(food)
-    time.sleep(0.0001)  
+    time.sleep(timesleep)  
 
 
 message = "Ваш результат " + str(len(snake1.coord_list))
