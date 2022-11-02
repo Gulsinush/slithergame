@@ -10,6 +10,7 @@ import time
 import tkinter.messagebox as mb
 import random as rd
 timesleep=0.3
+counter=0
 
 basic_coord = ([300,300,320,320],
                [320,300,340,320],
@@ -68,17 +69,19 @@ class Snake:
             food.change_food()
             food.draw()
             self.coord_list.append([self.coord_list[-1][0]-self.step_x, self.coord_list[-1][1]-self.step_y, self.coord_list[-1][2]-self.step_x, self.coord_list[-1][3]-self.step_y])
+            global counter
+            counter+=1
             global timesleep
             timesleep*=0.9
             
     def game_over(self):
         for i in self.coord_list[0]:
             if i<0 or i>size:
-                mb.showwarning("Attention","Game over")
+                mb.showwarning("Attention","Результат: " + str(counter))
                 window.destroy()
         for j in range(1, len(self.coord_list)):
             if self.coord_list[j]==self.coord_list[0]:
-                mb.showwarning("Attention","Game over")
+                mb.showwarning("Attention","Результат: " + str(counter))
                 window.destroy()
                
 class Food:
