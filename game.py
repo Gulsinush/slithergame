@@ -18,7 +18,7 @@ class Snake:
         self.step_x = 0
         self.step_y = 0
         self.flag_change=False
-        for i in range(length):
+        for i in range(0, length, 2):
             snake_section = [start_coord + i, start_coord, start_coord + width + i, start_coord + width]
             self.coord_list.append(snake_section)
         
@@ -66,7 +66,7 @@ class Snake:
             food.draw()
             step_x = self.coord_list[-1][0]-self.coord_list[-2][0]
             step_y = self.coord_list[-1][1]-self.coord_list[-2][1]
-            for j in range(10):
+            for j in range(0, 10, 2):
                 self.coord_list.append([self.coord_list[-1][i] + step_x if i % 2 == 0 else self.coord_list[-1][i] + step_y for i in range(len(self.coord_list[-1]))])
             #global timesleep
             #timesleep*=0.8
@@ -116,7 +116,7 @@ window.geometry('600x600')
 window.title("Snake")
 window.iconbitmap('logo.ico')
 size = 600
-timesleep=0.003
+timesleep=0.006
 canvas = tk.Canvas(window, width=size, height=size)
 canvas.pack()
 
@@ -132,13 +132,13 @@ while snake1.not_game_over():
     food.draw()
     window.update_idletasks()
     window.update()
-    window.bind('<KeyRelease-Left>',lambda e, step_x=-1, step_y=0: 
+    window.bind('<KeyRelease-Left>',lambda e, step_x=-2, step_y=0: 
             snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Right>',lambda e, step_x=1, step_y=0: 
+    window.bind('<KeyRelease-Right>',lambda e, step_x=2, step_y=0: 
             snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Up>',lambda e, step_x=0, step_y=-1: 
+    window.bind('<KeyRelease-Up>',lambda e, step_x=0, step_y=-2: 
             snake1.change_step(e,step_x, step_y))
-    window.bind('<KeyRelease-Down>',lambda e, step_x=0, step_y=1: 
+    window.bind('<KeyRelease-Down>',lambda e, step_x=0, step_y=2: 
             snake1.change_step(e,step_x, step_y))
     snake1.change_coord(food)
     time.sleep(timesleep)  
