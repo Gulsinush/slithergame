@@ -8,8 +8,13 @@ import tkinter as tk
 import time
 import tkinter.messagebox as mb
 import random as rd
+from datetime import timedelta, datetime
 
-
+def score_field():
+    global size,top_boarder
+    canvas.create_rectangle(0,0,size,top_boarder, outline="black")
+    canvas.create_text(10, 15, anchor="w", text="Score:     "+ str(len(snake1.coord_list)))
+    canvas.create_text(400, 15, anchor="w", text="Time:     "+ str(datetime.now()-start_time)[:-7])
 
 class Snake:
     
@@ -72,8 +77,8 @@ class Snake:
             #timesleep*=0.8
     
     def not_game_over(self):
-        for i in self.coord_list[0]:
-            if i<0 or i>size:
+        for i in range(len(self.coord_list[0])):
+            if (i%2==0 and self.coord_list[0][i]<0) or (i%2==1 and self.coord_list[0][i]<top_boarder) or self.coord_list[0][i]>size:
                 return False
         for part1 in self.coord_list[50:]:
             if intersection(self.coord_list[0], part1):
@@ -106,7 +111,7 @@ class Food:
     
     def change_food(self):
         food_x = rd.randint(0, 580)
-        food_y = rd.randint(0, 580)
+        food_y = rd.randint(top_boarder, 580)
         self.food_coord = [food_x, food_y, food_x+20, food_y+20]
         
 
@@ -116,11 +121,12 @@ window.geometry('600x600')
 window.title("Snake")
 window.iconbitmap('logo.ico')
 size = 600
+top_boarder=40
 timesleep=0.006
 canvas = tk.Canvas(window, width=size, height=size)
 canvas.pack()
 
-
+start_time=datetime.now()
 snake1 = Snake(300,40,20)
 food = Food()
 
@@ -130,6 +136,7 @@ while snake1.not_game_over():
     snake1.flag_change=False
     snake1.draw()
     food.draw()
+    score_field()
     window.update_idletasks()
     window.update()
     window.bind('<KeyRelease-Left>',lambda e, step_x=-2, step_y=0: 
