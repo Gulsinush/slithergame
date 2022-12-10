@@ -119,7 +119,7 @@ class Food:
 window = tk.Tk()
 window.geometry('600x600')
 window.title("Snake")
-window.iconbitmap('logo.ico')
+#window.iconbitmap('logo.ico')
 size = 600
 top_boarder=40
 timesleep=0.006
